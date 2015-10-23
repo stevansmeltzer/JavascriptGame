@@ -3,7 +3,8 @@ var actorChars = {
   "@": Player,
   "o": Coin, // A coin will wobble up and down
   "=": Lava, "|": Lava, "v": Lava,   
-  "y": Death
+  "y": Death, "z": Death,
+  "1": Portal1, "2": Portal2, "3": Portal3
   };
 
 function Level(plan) {
@@ -91,11 +92,42 @@ function Coin(pos) {
 }
 Coin.prototype.type = "coin";
 
-function Death(pos){
+function Portal1(pos, ch){
 	this.pos = pos;
-	this.size = new Vector(5,24);
-	this.speed = new Vector(6,0)
+	this.size = new Vector(1,3);
+	}
 	
+
+Portal1.prototype.type = "portal1";
+
+
+function Portal2(pos, ch){
+	this.pos = pos;
+	this.size = new Vector(1,3);
+	}
+	
+
+Portal2.prototype.type = "portal2";
+
+
+function Portal3(pos, ch){
+	this.pos = pos;
+	this.size = new Vector(1,3);
+	}
+	
+
+Portal3.prototype.type = "portal3";
+
+function Death(pos, ch){
+	this.pos = pos;
+	if (ch == "y"){
+		this.size = new Vector(5,24);
+		this.speed = new Vector(6,0);
+	} else if (ch == "z"){
+		this.size = new Vector(150,10);
+		this.speed = new Vector(0,-0.8);
+		
+	}
 }
 
 Death.prototype.type = "death";
@@ -110,9 +142,10 @@ function Lava(pos, ch) {
     this.speed = new Vector(2, 0);
 	reverse = true;
   } else if (ch == "|") {
-    // Vertical lava
-    this.speed = new Vector(0, 2);
+    // laser
+    this.speed = new Vector(3, 0);
 	reverse = true;
+	this.size = new Vector(1, 4);
   } else if (ch == "v") {
     // Drip lava. Repeat back to this pos.
     this.speed = new Vector(0, 3);
@@ -297,6 +330,10 @@ Lava.prototype.act = function(step, level) {
     this.speed = this.speed.times(-1);
 };
 
+Portal1.prototype.act = function(level) {};
+Portal2.prototype.act = function(level) {};
+Portal3.prototype.act = function(level) {};
+
 
 var maxStep = 0.05;
 
@@ -369,10 +406,16 @@ Player.prototype.act = function(step, level, keys) {
   if (level.status == "lost") {
     this.pos.y += step;
     this.size.y -= step;
+	this.size.x += step;
+  } else if (level.status == "1"){
+	  level.status = "won";
+	 
+  } else if(level.status == "won"){
+		 this.size.y -= step;
   }
 };
 
-Level.prototype.playerTouched = function(type, actor) {
+Level.prototype.playerTouched = function(type, actor, step, ch) {
 
   // if the player touches lava and the player hasn't won
   // Player loses
@@ -390,9 +433,26 @@ Level.prototype.playerTouched = function(type, actor) {
       this.status = "won";
       this.finishDelay = 1;
     }
-  } else if (type == "stop"){
-	  
-  } 
+  } else if (type == "portal1") {	
+		this.status = "1";
+		this.finishDelay = 1;
+		this.actors = this.actors.filter(function(other) {
+      return other != actor;
+    });
+  } else if (type == "portal2"){
+		this.status = "2";
+		this.finishDelay = 0;
+		this.actors = this.actors.filter(function(other) {
+      return other != actor;
+    });
+  } else if (type == "portal3"){
+		this.status = "3";
+		this.finishDelay = 0;
+		this.actors = this.actors.filter(function(other) {
+      return other != actor;
+    });
+	}
+  
 };
 
 // Arrow key codes for readibility
@@ -469,10 +529,16 @@ function runGame(plans, Display) {
     runLevel(new Level(plans[n]), Display, function(status) {
       if (status == "lost")
         startLevel(n);
-      else if (n < plans.length - 1)
+	  else if (status == "1")
+		  startLevel(n + 1);
+	  else if (status == "2")
+		  startLevel(n + 2);
+	  else if (status == "3")
+		  startLevel(n + 3);
+	  else if (n < plans.length - 1)
         startLevel(n + 1);
       else
-        console.log("You win!");
+        alert("You win!");
     });
   }
   startLevel(0);

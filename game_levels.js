@@ -107,7 +107,7 @@ var GAME_LEVELS = [
    "                                                                                                                 o",
    "           x                                                                                                      "],
   ["           x                                                                                                 o",
-   "           x                                                                                                ",
+   "  @        x                                                                                                ",
    "xxxx   xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
    "x                         c |           c     |       c          |  x                                        x",
    "x                                                                   x                                        x",
@@ -129,7 +129,7 @@ var GAME_LEVELS = [
    "x                                   x           x         x     =  x       =x        xxxxxx              x   x",
    "x                               1   x                                                                    x   x",  
    "x                                   x                             =                              xxxx        x",
-   "x                                   x          =                                      =          c        @  x",
+   "x                                   x          =                                      =          c           x",
    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"],
 ];
 

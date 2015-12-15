@@ -1,0 +1,176 @@
+<!doctype HTML>
+<html>
+<head>
+<title>Canvas Game</title>
+<style>
+canvas {
+	margin-right: 20%;
+    margin-left: 20%;
+
+}
+</style>
+</head>
+
+<body>
+<canvas id="canvas" width = 800 height = 400></canvas>
+<script>
+var actors = [player];
+var bullets = new Array();
+function bullet(){
+	this.color="white";
+	this.x = Math.floor(Math.random()*300+250);
+	this.y= 180;
+	this.width= 10;
+	this.height= 10;
+}
+var boundingBox ={
+	color: "white",
+	x: 250,
+	y: 200,
+	width: 300,
+	height: 300,
+	draw: function(){
+		context.strokeStyle = this.color;
+		context.lineWidth = 3;
+		context.rect(this.x,this.y,this.width,this.height);
+		context.stroke();
+	}
+}
+var player ={
+	color: "red",
+	x: 400,
+	y: 400,
+	width: 20,
+	height: 20,
+	draw: function() {
+		context.fillStyle = this.color;
+		context.fillRect(this.x, this.y, this.width, this.height);
+	}
+};
+
+
+
+var canvas = document.getElementById('canvas');
+var	context = canvas.getContext('2d');
+
+
+
+function init(){
+	var FPS = 20;
+	drawBackground();
+    
+	window.addEventListener('resize', resizeCanvas, false);
+    window.addEventListener('orientationchange', resizeCanvas, false);
+    resizeCanvas();
+	
+	setInterval(function(){
+	update(), 3000;
+	draw(player, arrows);
+	}, 1000/FPS);
+	
+	
+}
+
+function update(){
+	
+}
+
+function draw(player, keys){
+	if (status == "lost"){
+	context.clearRect(0,0, canvas.width,canvas.height);
+	drawBackground();
+	loseScreen();
+	} else {
+	
+	context.clearRect(0,0, canvas.width, canvas.height);
+	drawBackground();
+	boundingBox.draw();
+	playerMove(keys);
+	for (var i = 0; i < bullets.length; i++){
+	bulletMove(i);
+	bulletDraw(i);
+	}
+	player.draw();
+	}
+}
+
+
+function resizeCanvas() {
+    canvas.height = window.innerHeight;
+	drawBackground();
+	}
+	
+function drawBackground(){
+	context.fillStyle = "black";
+	context.fillRect(0,0,800,800);
+}
+var status;
+
+
+function playerMove(keys) {
+	var leftB = 250;
+	var topB = 200;
+	var rightB = 550;
+	var botB = 500;
+	if(keys.left) {player.x -=5; if (player.x < leftB) player.x = leftB;}
+	if(keys.right) {player.x +=5;if (player.x + player.width> rightB) player.x = rightB - player.width;}
+	if(keys.up) {player.y -= 5;if (player.y < topB) player.y = topB;}
+	if(keys.down) {player.y +=5;if (player.y + player.height > botB) player.y = botB - player.height;}
+	
+	for (var i = 0; i <bullets.length; i++){
+	if (
+		player.x <= (bullets[i].x + 10)
+		&& bullets[i].x <= (player.x + 10)
+		&& player.y <= (bullets[i].y + 10)
+		&& bullets[i].y <= (player.y + 10)
+	) {
+		status = "lost";
+		}
+	}
+}
+
+function bulletDraw(i){
+	bullets.push(new bullet());
+	context.fillStyle = bullets[i].color;
+	context.fillRect(bullets[i].x,bullets[i].y,bullets[i].width,bullets[i].height);
+}
+
+function bulletMove(i){
+	bullets[i].y += 3;
+	if (bullets[i].y > 600){ bullets.splice(bullets[i]);}
+}
+
+
+var arrowCodes = {37: "left", 38: "up", 39: "right", 40: "down"};
+
+function trackKeys(codes) {
+  var pressed = Object.create(null);
+
+  function handler(event) {
+    if (codes.hasOwnProperty(event.keyCode)) {
+      // If the event is keydown, set down to true. Else set to false.
+      var down = event.type == "keydown";
+      pressed[codes[event.keyCode]] = down;
+      // We don't want the key press to scroll the browser window, 
+      // This stops the event from continuing to be processed
+      event.preventDefault();
+    }
+  }
+  addEventListener("keydown", handler);
+  addEventListener("keyup", handler);
+  return pressed;
+}
+
+var arrows = trackKeys(arrowCodes);
+
+function loseScreen(){
+	context.fillStyle="red";
+	context.textAlign = "center";
+	context.font="30px Impact center";
+	context.fillText("YOU LOSE", canvas.width/2, canvas.height/2);
+}
+
+window.onload = init();
+</script>
+</body>
+</html>
